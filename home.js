@@ -11,7 +11,7 @@ async function loadResources() {
     document.getElementById("page-container").appendChild(app.view);
     app.stop();
 
-    var background = await new PIXI.Sprite.from("/images/snowfall.webm");
+    var background = await new PIXI.Sprite.from("snowfall.webm");
     background.width = app.renderer.width * 1.1;
     background.height = app.renderer.height;
     background.anchor.x = 0;
@@ -23,7 +23,7 @@ async function loadResources() {
     background.texture.baseTexture.resource.source.loop = true;
     sprites.background = background;
 
-    var transition = await new PIXI.Sprite.from("/images/transition.webm");
+    var transition = await new PIXI.Sprite.from("transition.webm");
     transition.width = app.renderer.width * 1.1;
     transition.height = app.renderer.height * 1.1;
     transition.anchor.x = 0;
@@ -34,7 +34,7 @@ async function loadResources() {
     background.texture.baseTexture.resource.source.loop = true;
     sprites.transition = transition;
 
-    var footer = await new PIXI.Sprite.from("/images/footer.webp");
+    var footer = await new PIXI.Sprite.from("footer.webp");
     footer.width = app.renderer.width;
     footer.height = app.renderer.height * 0.25;
     footer.anchor.x = 0;
