@@ -18,7 +18,6 @@ async function loadResources() {
     background.anchor.y = 0;
     background.position.x = app.renderer.width * -0.1;
     background.position.y = 0;
-    background.alpha = 0.5;
     background.texture.baseTexture.resource.source.muted = true;
     background.texture.baseTexture.resource.source.loop = true;
     sprites.background = background;
