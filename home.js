@@ -1,86 +1,131 @@
-const loader = new PIXI.Loader();
-var sprites = {};
-var app;
+const mintDate = new Date("Dec 25, 2021 00:00:00").getTime();
+
+var days;
+var hrs;
+var mins;
+var secs;
+
+window.onload = function() {onLoad()};
 
 
-async function loadResources() {
-    app = new PIXI.Application();
-    app.renderer.backgroundColor = 0x070927;
-    app.view.style.width = "100%";
-    app.view.style.height = "100%";
-    document.getElementById("page-container").appendChild(app.view);
-    app.stop();
+async function onLoad() {
+    if ("solana" in window) {
+        const provider = window.solana;
+        if (provider.isPhantom) {
+          console.log(provider);
+        }
+    }
 
-    var background = await new PIXI.Sprite.from("images/snowfall.webm");
-    background.width = app.renderer.width * 1.1;
-    background.height = app.renderer.height;
-    background.anchor.x = 0;
-    background.anchor.y = 0;
-    background.position.x = app.renderer.width * -0.1;
-    background.position.y = 0;
-    background.texture.baseTexture.resource.source.muted = true;
-    background.texture.baseTexture.resource.source.loop = true;
-    sprites.background = background;
+    //days = document.getElementById("days-countdown");
+    //hrs = document.getElementById("hrs-countdown");
+    //mins = document.getElementById("mins-countdown");
+    //secs = document.getElementById("secs-countdown");
 
-    var transition = await new PIXI.Sprite.from("images/transition.webm");
-    transition.width = app.renderer.width * 1.1;
-    transition.height = app.renderer.height * 1.1;
-    transition.anchor.x = 0;
-    transition.anchor.y = 0;
-    transition.position.x = app.renderer.width * -0.05;
-    transition.position.y = app.renderer.height * -0.05;
-    transition.texture.baseTexture.resource.source.muted = true;
-    background.texture.baseTexture.resource.source.loop = true;
-    sprites.transition = transition;
+    //var x = setInterval(function() {
+    //    updateCountdown();
+    //}, 1000);
 
-    var footer = await new PIXI.Sprite.from("images/footer.webp");
-    footer.width = app.renderer.width;
-    footer.height = app.renderer.height * 0.25;
-    footer.anchor.x = 0;
-    footer.anchor.y = 1;
-    footer.position.x = 0;
-    footer.position.y = app.renderer.height;
-    sprites.footer = footer;
+    var allMods = $(".slider");
+    allMods.each(function(i, el) {
+        var el = $(el);
+        if (el.visible(true)) {
+            el.addClass("already-visible");
+        }
+    });
 
-    app.start();
-    loadSplashScreen();
-}
+    var acc = document.getElementsByClassName("accordion");
+    var i;
 
-
-function loadSplashScreen() {
-    document.getElementById("splash-screen").style.display = "block";
-    document.getElementById("home-screen").style.display = "none";
-    app.stage.addChild(sprites.background);
-    app.stage.addChild(sprites.footer);
-}
-
-
-function doTransition() {
-    sprites.transition.texture.baseTexture.resource.source.currentTime = 0;
-    transition_controller = sprites.transition.texture.baseTexture.resource.source;
-    transition_controller.addEventListener('timeupdate', checkVideoTime);
-    transition_controller.addEventListener('ended', endTransition);
-    app.stage.addChild(sprites.transition);
-    transition_controller.play();
-}
-
-
-function checkVideoTime() {
-    console.log(transition_controller.currentTime);
-    transition_controller = sprites.transition.texture.baseTexture.resource.source;
-    if (transition_controller.currentTime >= 0.75) {
-        document.getElementById("splash-screen").style.display = "none";
-        app.stage.removeChild(sprites.background);
-        app.stage.removeChild(sprites.footer);
+    for (i = 0; i < acc.length; i++) {
+        acc[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var panel = this.getElementsByClassName("panel")[0];
+            var plusminus = this.getElementsByClassName("plusminus")[0];
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+                plusminus.innerHTML = "+"
+            }
+            else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+                plusminus.innerHTML = "-"
+            }
+        });
     }
 }
 
 
-function endTransition() {
-    console.log("ended");
-    transition_controller = sprites.transition.texture.baseTexture.resource.source;
-    transition_controller.removeEventListener('ended', endTransition);
-    app.stage.removeChild(sprites.transition);
-    document.getElementById("page-container").style.display = "none";
-    document.getElementById("home-screen").style.display = "block";
+async function connectWallet() {
+    try {
+        const resp = await window.solana.connect();
+        var wallet_button = document.getElementById("wallet-button");
+        wallet_button.innerHTML = resp.publicKey.toString().slice(0, 4).toUpperCase() + "..." + resp.publicKey.toString().slice(-4).toUpperCase();
+    }
+    catch {
+        console.log("User rejected the request");
+    }
+}
+
+function updateCountdown() {
+    var now = new Date().getTime();
+    var delta = mintDate - now;
+
+    days.innerHTML = Math.floor(delta / (1000 * 60 * 60 * 24));
+    hrs.innerHTML = Math.floor((delta % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    mins.innerHTML = Math.floor((delta % (1000 * 60 * 60)) / (1000 * 60));
+    secs.innerHTML = Math.floor((delta % (1000 * 60)) / 1000);
+
+}
+
+function scrollToElem(element) {
+    element_pos = document.getElementById(element).getBoundingClientRect().top - 10;
+    window.scrollTo(0, element_pos);
+}
+
+(function($) {
+
+  /**
+   * Copyright 2012, Digital Fusion
+   * Licensed under the MIT license.
+   * http://teamdf.com/jquery-plugins/license/
+   *
+   * @author Sam Sehnert
+   * @desc A small plugin that checks whether elements are within
+   *     the user visible viewport of a web browser.
+   *     only accounts for vertical position, not horizontal.
+   */
+
+  $.fn.visible = function(partial) {
+
+      var $t            = $(this),
+          $w            = $(window),
+          viewTop       = $w.scrollTop(),
+          viewBottom    = viewTop + $w.height(),
+          _top          = $t.offset().top,
+          _bottom       = _top + $t.height(),
+          compareTop    = partial === true ? _bottom : _top,
+          compareBottom = partial === true ? _top : _bottom;
+
+    return ((compareBottom <= viewBottom) && (compareTop >= viewTop));
+
+  };
+
+})(jQuery);
+
+
+function testScroll() {
+    var allMods = $(".slider");
+    allMods.each(function(i, el) {
+        var el = $(el);
+        if (el.visible(true)) {
+            if (el.hasClass("slide-l")) {
+                el.addClass("slide-in-l");
+            }
+            else if (el.hasClass("slide-r")) {
+                el.addClass("slide-in-r");
+            }
+            else {
+                el.addClass("come-in");
+            }
+        }
+    });
 }
