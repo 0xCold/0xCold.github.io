@@ -8,8 +8,9 @@ html, body, #page-container {
 
 
 #pc-container {
-    background-image: url("/images/PC.jpg");
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
-=}
+
+}
+
+#pc-img {
+    object-fit: cover;
+}
