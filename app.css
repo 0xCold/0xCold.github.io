@@ -9,8 +9,7 @@ html, body, #page-container {
 
 #pc-container {
     background-image: url("/images/PC.jpg");
-    background-repeat: no-repeat;
+    overflow: hidden;
     background-size: cover;
-    height: 100%;
-    width: 100%;
-}
+    background-position: center;
+=}
